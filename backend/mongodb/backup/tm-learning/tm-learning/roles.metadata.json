@@ -1,1 +1,0 @@
-{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"tm-learning.roles"}],"uuid":"9f4fa0a970584595b77a9dfc3b27e8ef"}

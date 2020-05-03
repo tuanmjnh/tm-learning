@@ -1,1 +1,1 @@
-{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"test.categories"}],"uuid":"2c6058583b1e4dcea58a2d20a9281ee7"}
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"tm-learning.categories"}],"uuid":"162e44d1a039480ab1cb7ad220d5b0a4"}
