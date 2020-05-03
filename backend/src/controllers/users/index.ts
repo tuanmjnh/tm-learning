@@ -22,7 +22,7 @@ class UsersController {
         } as any);
       }
       if (!req.query.sortBy) req.query.sortBy = 'email';
-      const rowsNumber = await MUser.where(conditions as any).countDocuments();
+      const countDocuments = await MUser.where(conditions as any).countDocuments();
       const options = {
         skip: (parseInt(req.query.page as string) - 1) * parseInt(req.query.rowsPerPage as string),
         limit: parseInt(req.query.rowsPerPage as string),
@@ -33,7 +33,7 @@ class UsersController {
       MUser.find(conditions as any, null, options, (e: any, rs: any) => {
         if (e) return res.status(500).send(e);
         // if (!rs) return res.status(404).send('No data exist!')
-        return res.status(200).json({ rowsNumber: req.query.rowsNumber, data: rs });
+        return res.status(200).json({ rowsNumber: countDocuments, data: rs });
       });
     } catch (e) {
       return res.status(500).send('invalid');

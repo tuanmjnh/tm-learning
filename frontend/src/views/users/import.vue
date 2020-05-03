@@ -167,7 +167,7 @@ export default {
         descending: false,
         page: 1,
         rowsPerPage: 10,
-        rowsNumber: 1,
+        // rowsNumber: 1,
         enable: true
       },
       visibleColumns: [],
@@ -184,138 +184,153 @@ export default {
   },
   methods: {
     onLoadedFile(data) {
-      if (!this.append) {
-        this.items = []
-        this.loadedData = []
-        this.loadedReport = { wrong: [], correct: [], success: [], error: [] }
-      }
-      if (!data) {
-        this.$q.notify({
-          message: this.$t('error.exist'),
-          color: 'warning'
-        })
-        return null
-      }
-      if (data.length < 2) return
-      this.columns = []
-      Object.keys(data[0]).forEach(e => {
-        this.columns.push({
-          name: e,
-          field: e,
-          label: data[0][e],
-          align: 'left',
-          sortable: true
-        })
-        this.visibleColumns.push(e)
-      })
-      for (let i = 1; i < data.length; i++) {
-        const e = data[i]
-        const item = {}
-        // Check username
-        if (e.A) {
-          e.A = e.A.trim()
-          item.username = e.A
-        } else {
-          this.loadedReport.wrong.push(`${i}.A`)
-          continue
+      try {
+        if (!this.append) {
+          this.items = []
+          this.loadedData = []
+          this.loadedReport = { wrong: [], correct: [], success: [], error: [] }
         }
-        if (e.B) {
-          e.B = e.B.trim()
-          item.password = e.B
-        } else {
-          this.loadedReport.wrong.push(`${i}.B`)
-          continue
-        }
-        if (e.C) {
-          e.C = e.C.trim()
-          item.fullName = e.C
-        } else {
-          this.loadedReport.wrong.push(`${i}.B`)
-          continue
-        }
-        if (e.D) {
-          e.D = e.D.trim()
-          item.email = e.D
-        }
-        if (e.E) {
-          e.E = e.E.trim()
-          item.phone = e.E
-        }
-        if (e.F) {
-          e.F = e.F.trim()
-          item.personNumber = e.F
-        }
-        if (e.G) {
-          e.G = e.G.trim()
-          item.region = this.regions.find(x => `${x.cc_iso}-${x.cc}` === e.G)
-          if (item.region) {
-            e.G = item.region.name_l
-            item.region = item.region.id
-          } else e.G = ''
-        }
-        if (e.H) {
-          e.H = e.H.trim()
-          item.dateBirth = this.$moment(e.H, 'DD/MM/YYYY')
-        }
-        if (e.I) {
-          item.gender = this.$store.getters.genders.find(x => x.id === e.I)
-          if (item.gender) {
-            e.I = this.$t(`gender.${item.gender.code}`)
-            item.gender = item.gender.id
-          } else e.I = ''
-        }
-        if (e.J) {
-          e.J = e.J.trim()
-          item.address = e.J
-        }
-        if (e.K) {
-          e.K = e.K.trim()
-          item.group = this.groups.find(x => x.code === e.K)
-          if (item.group) {
-            e.K = item.group.name
-            item.group = item.group.code
-          } else {
-            this.loadedReport.wrong.push(`${i}.K`)
-            continue
-          }
-        }
-        if (e.L) {
-          const roles = e.L.trim().split(';')
-          if (!roles.length) {
-            this.loadedReport.wrong.push(`${i}.L1`)
-            continue
-          }
-          item.roles = []
-          e.L = []
-          roles.forEach(r => {
-            const tmp = this.roles.find(x => x.key === r)
-            if (tmp) {
-              item.roles.push(tmp.id)
-              e.L.push(tmp.label)
-            }
+        if (!data) {
+          this.$q.notify({
+            message: this.$t('error.exist'),
+            color: 'warning'
           })
-          if (!item.roles.length) {
-            this.loadedReport.wrong.push(`${i}.L2`)
+          return null
+        }
+        if (data.length < 2) return
+        this.columns = []
+        Object.keys(data[0]).forEach(e => {
+          this.columns.push({
+            name: e,
+            field: e,
+            label: data[0][e],
+            align: 'left',
+            sortable: true
+          })
+          this.visibleColumns.push(e)
+        })
+        for (let i = 1; i < data.length; i++) {
+          const e = data[i]
+          const item = {}
+          // Check username
+          if (e.A) {
+            e.A = e.A.toString().trim()
+            item.username = e.A
+          } else {
+            this.loadedReport.wrong.push(`${i}.A`)
             continue
           }
-          e.L = e.L.join(', ')
+          if (e.B) {
+            e.B = e.B.toString().trim()
+            item.password = e.B
+          } else {
+            this.loadedReport.wrong.push(`${i}.B`)
+            continue
+          }
+          if (e.C) {
+            e.C = e.C.toString().trim()
+            item.fullName = e.C
+          } else {
+            this.loadedReport.wrong.push(`${i}.B`)
+            continue
+          }
+          if (e.D) {
+            e.D = e.D.toString().trim()
+            item.email = e.D
+          }
+          if (e.E) {
+            e.E = e.E.toString().trim()
+            // e.E = e.E.trim()
+            item.phone = e.E
+          }
+          if (e.F) {
+            e.F = e.F.toString().trim()
+            item.personNumber = e.F
+          }
+          if (e.G) {
+            e.G = e.G.toString().trim()
+            item.region = this.regions.find(x => `${x.cc_iso}-${x.cc}` === e.G)
+            if (item.region) {
+              e.G = item.region.name_l
+              item.region = item.region.id
+            } else e.G = ''
+          }
+          if (e.H) {
+            e.H = e.H.toString().trim()
+            item.dateBirth = this.$moment(e.H, 'DD/MM/YYYY')
+          }
+          if (e.I) {
+            item.gender = this.$store.getters.genders.find(x => x.id === e.I)
+            if (item.gender) {
+              e.I = this.$t(`gender.${item.gender.code}`)
+              item.gender = item.gender.id
+            } else e.I = ''
+          }
+          if (e.J) {
+            e.J = e.J.toString().trim()
+            item.address = e.J
+          }
+          if (e.K) {
+            e.K = e.K.toString().trim()
+            item.group = this.groups.find(x => x.code === e.K)
+            if (item.group) {
+              e.K = item.group.name
+              item.group = item.group.code
+            } else {
+              this.loadedReport.wrong.push(`${i}.K`)
+              continue
+            }
+          }
+          if (e.L) {
+            const roles = e.L.toString().trim().split(';')
+            if (!roles.length) {
+              this.loadedReport.wrong.push(`${i}.L1`)
+              continue
+            }
+            item.roles = []
+            e.L = []
+            roles.forEach(r => {
+              const tmp = this.roles.find(x => x.key === r)
+              if (tmp) {
+                item.roles.push(tmp.id)
+                e.L.push(tmp.label)
+              }
+            })
+            if (!item.roles.length) {
+              this.loadedReport.wrong.push(`${i}.L2`)
+              continue
+            }
+            e.L = e.L.join(', ')
+          }
+          if (e.M) {
+            item.enable = e.M.toString().trim().toLowerCase() === 'true'
+            e.M = item.enable
+          }
+          if (e.N) {
+            e.N = e.N.toString().trim()
+            item.avatar = e.N
+          }
+          if (e.O) {
+            e.O = e.O.toString().trim()
+            item.note = e.O
+          }
+          this.items.push(item)
+          this.loadedData.push(e)
         }
-        if (e.M) {
-          item.enable = e.M.toString().trim().toLowerCase() === 'true'
-          e.M = item.enable
-        }
-        if (e.N) {
-          e.N = e.N.trim()
-          item.avatar = e.N
-        }
-        if (e.O) {
-          e.O = e.O.trim()
-          item.note = e.O
-        }
-        this.items.push(item)
-        this.loadedData.push(e)
+        // pagination
+        // const pagination = Pagination(this.questions, this.pagination.page, this.pagination.rowsPerPage)
+        // this.items = pagination.data
+        // this.pagination.rowsNumber = pagination.totalPage
+        // this.pagination.rowsNumber = Math.ceil(items.length / limit);
+        this.loading = false
+      } catch (error) {
+        console.log(error)
+        this.$q.notify({
+          message: error,
+          color: 'negative'
+        })
+        this.loading = false
       }
-      this.loading = false
     },
     onColumns(value) {
       var index = this.visibleColumns.indexOf(value)
