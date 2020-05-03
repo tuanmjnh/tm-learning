@@ -1,0 +1,120 @@
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import session from 'express-session';
+import flash from 'express-flash';
+import compression from 'compression';
+// import lusca from 'lusca';
+import { Routes } from '../router';
+import * as mongoose from './mongoose';
+import middleware from './middleware';
+class Application {
+  public app: express.Application;
+  public Routes = new Routes();
+  constructor() {
+    // Connection MongoDB
+    // mongoose.initializeAtlas();
+    mongoose.initialize();
+    // Create App
+    this.app = express();
+    // Config
+    this.config();
+  }
+  private config(): void {
+    // trust proxy ip
+    this.app.set('trust proxy', true);
+    // static public
+    // app.use(express.static(process.env.PUBLIC_PATH, { maxAge: 31557600000 }))
+    // app.use('/public', express.static(path.join(__dirname, 'public')))
+    this.app.use(
+      `${process.env.BASE_URL}${process.env.PUBLIC_PATH}`,
+      express.static(process.env.PUBLIC_DIR),
+    );
+    this.app.use(
+      `${process.env.BASE_URL}${process.env.STATIC_PATH}`,
+      express.static(process.env.STATIC_DIR),
+    );
+    this.app.use(
+      `${process.env.BASE_URL}${process.env.UPLOAD_PATH}`,
+      express.static(process.env.UPLOAD_DIR),
+    );
+    // CORS middleware
+    this.app.use(cors());
+    this.app.options('*', cors());
+    // support application/json type post data
+    this.app.use(bodyParser.json());
+    // support application/x-www-form-urlencoded post data
+    this.app.use(bodyParser.urlencoded({ extended: false }));
+    // compression
+    this.app.use(compression());
+    // secret variable
+    this.app.set('secret', process.env.SECRET);
+    // flash
+    this.app.use(flash());
+    // session
+    // this.app.use(express.session({ cookie: { maxAge: 60000 } }));
+    this.app.use(
+      session({
+        resave: true,
+        saveUninitialized: true,
+        secret: process.env.SECRET,
+        // store: new MongoStore({
+        //   url: mongoUrl,
+        //   autoReconnect: true
+        // })
+      }),
+    );
+    // lusca
+    // this.app.use(
+    // lusca({
+    // csrf: true,
+    // csp: {
+    //   /* ... */
+    // },
+    //     xframe: 'SAMEORIGIN',
+    //     p3p: 'ABCDEF',
+    //     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    //     xssProtection: true,
+    //     nosniff: true,
+    //     referrerPolicy: 'same-origin',
+    //   }),
+    // );
+    // Error Handler. Provides full stack - remove for production
+    // if (process.env.NODE_ENV !== 'production') {
+    //   const errorHandler = require('errorHandler');
+    //   this.app.use(errorHandler());
+    // }
+
+    // middleware
+    this.app.use(middleware);
+    /* GET home page. */
+    this.app.get(
+      process.env.BASE_URL,
+      (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        res.end(`TM-Learning Server. version: ${process.env.npm_package_version}`); // process.env.npm_package_version
+      },
+    );
+    // Mount the router at /api so all its routes start with /api
+    this.app.use(`${process.env.BASE_URL}api`, this.Routes.router);
+  }
+  public Start(port: number): void {
+    // this.Close();
+    this.app
+      .listen(port) // , '192.168.1.10' // '127.0.0.1'
+      .on('listening', () => {
+        // process.env.HOST = `http://${server.address().address}:${port}`
+        console.log(`Web server listening on: ${process.env.PORT}`);
+        console.log(`Mode: ${process.env.NODE_ENV}`);
+        console.log(`Base URL: ${process.env.BASE_URL}`);
+      })
+      .on('error', (err) => {
+        console.log(err);
+      });
+  }
+  public Close(): void {
+    process.exit();
+    console.log(process);
+  }
+}
+
+export default Application;
