@@ -124,6 +124,7 @@ class ExercisesController {
       req.body.createdAt = new Date();
       req.body.createdBy = req.verify._id;
       req.body.createdIp = getIp(req);
+      console.log(req.body.createdIp);
       // req.body.userAgent = getUserAgent(req);
       req.body.startAt = moment(req.body.startAt, 'DD/MM/YYYY HH:mm:00');
       req.body.endAt = moment(req.body.endAt, 'DD/MM/YYYY HH:mm:00');
@@ -161,7 +162,7 @@ class ExercisesController {
       console.log(e);
       await session.abortTransaction();
       session.endSession();
-      return res.status(500).send('invalid');
+      return res.status(500).send({ error: e, ip: req.ip });
     }
   };
 
@@ -198,7 +199,7 @@ class ExercisesController {
         return res.status(500).send('invalid');
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send(e);
     }
   };
 
@@ -218,7 +219,7 @@ class ExercisesController {
       }
       return res.status(203).json(rs);
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send(e);
     }
   };
 
@@ -235,7 +236,7 @@ class ExercisesController {
         return res.status(500).send('invalid');
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send(e);
     }
   };
 }

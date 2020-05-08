@@ -6,8 +6,7 @@ export const getIp = (request: any) => {
   // console.log(req.connection.localAddress)
   // console.log(req.connection.localPort)
   const _ip = request.ip;
-  if (_ip === '::1') return '127.0.0.1';
-  return _ip;
+  return _ip === '::1' || !_ip ? '127.0.0.1' : _ip;
 };
 
 export const getHost = (request: any) => {

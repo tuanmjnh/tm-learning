@@ -324,7 +324,7 @@ export default {
         // this.pagination.rowsNumber = Math.ceil(items.length / limit);
         this.loading = false
       } catch (error) {
-        console.log(error)
+        // console.log(error)
         this.$q.notify({
           message: error,
           color: 'negative'
