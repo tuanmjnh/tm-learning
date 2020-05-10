@@ -12,7 +12,7 @@
   "scripts": {
     "start": "set NODE_ENV=production & node server.js",
     "start:dev": "set NODE_ENV=production & node dist/server.js",
-    "dev": "set NODE_ENV=development & ts-node-dev --inspect --no-notify ./src/server.ts",
+    "dev": "set NODE_ENV=development & ts-node-dev --inspect=127.0.0.1:9229 --no-notify ./src/server.ts",
     "dev:nodemon": "set NODE_ENV=development & tsc -w & nodemon -q -w dist dist/main.js",
     "test": "echo \\\"Error: no test specified\\\" && exit 1",
     "build:wp": "webpack --color --mode production",
@@ -32,6 +32,7 @@
     "express-flash": "0.0.2",
     "express-session": "^1.17.0",
     "formidable": "^1.2.2",
+    "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "lusca": "^1.6.1",
     "moment": "^2.24.0",

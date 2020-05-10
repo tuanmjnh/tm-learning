@@ -99,6 +99,7 @@ class ExamsController {
       const countDocuments = await MExercises.where(conditions as any).countDocuments();
       const qry = MExercises.aggregate([
         { $match: conditions },
+        // get type of exercises
         {
           $lookup: {
             from: 'types',
@@ -116,6 +117,7 @@ class ExamsController {
             ],
           },
         },
+        // get total test
         {
           $lookup: {
             from: 'exams',
@@ -131,37 +133,38 @@ class ExamsController {
                   },
                 },
               },
-              { $project: { _id: 1 } },
+              { $project: { _id: 1, result: 1 } },
             ],
           },
         },
-        {
-          $lookup: {
-            from: 'exams',
-            as: 'eligibleExams',
-            let: { id: { $toString: '$_id' } },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ['$exercise', '$$id'] },
-                      { $eq: ['$startBy', req.verify._id] },
-                      { $eq: ['$result', 1] },
-                    ],
-                  },
-                },
-              },
-              { $project: { _id: 1 } },
-            ],
-          },
-        },
+        // get eligible
+        // {
+        //   $lookup: {
+        //     from: 'exams',
+        //     as: 'eligibleExams',
+        //     let: { id: { $toString: '$_id' } },
+        //     pipeline: [
+        //       {
+        //         $match: {
+        //           $expr: {
+        //             $and: [
+        //               { $eq: ['$exercise', '$$id'] },
+        //               { $eq: ['$startBy', req.verify._id] },
+        //               { $eq: ['$result', 1] },
+        //             ],
+        //           },
+        //         },
+        //       },
+        //       { $project: { _id: 1 } },
+        //     ],
+        //   },
+        // },
         {
           $replaceRoot: {
             newRoot: {
               $mergeObjects: [
                 { $arrayElemAt: ['$types', 0] },
-                { $arrayElemAt: ['$eligibleExams', 0] },
+                // { $arrayElemAt: ['$eligibleExams', 0] },
                 '$$ROOT',
               ],
             },

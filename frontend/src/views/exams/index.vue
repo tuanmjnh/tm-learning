@@ -109,6 +109,11 @@ export default {
     onSelect(params) {
       axiosApi.get('exams/get-exercies', { params: params.pagination }).then((x) => {
         this.items = x.data
+        this.items.forEach(e => {
+          if (!e.exams.length) e.eligibleExams = []
+          else e.eligibleExams = e.exams.filter(x => x.result)
+        })
+        console.log(this.items)
         this.pagination = params.pagination
         this.pagination.rowsNumber = x.rowsNumber
       })
@@ -117,6 +122,11 @@ export default {
       this.maximizedView = true
       this.dialogStart = true
       this.exercise = exercise
+    },
+    onGetEligible(exercise) {
+      if (!exercise.exams.length) return false
+      const eligible = exercise.exams.find(x => x.result)
+      return eligible && eligible.length || false
     },
     onDetails(exercise) {
       if (!exercise.exams.length) return

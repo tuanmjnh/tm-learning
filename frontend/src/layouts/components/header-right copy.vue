@@ -68,15 +68,16 @@
         <div class="text-h6 q-mb-md">{{$t('setting.title')}}</div>
         <q-list dense class="p-fix">
           <q-item>
-            <q-btn-dropdown flat no-caps :label="currentLanguage.name_l" icon="g_translate" size="md"
-              class="btn-setting" :color="$store.state.app.darkMode?'':'blue-grey'">
+            <q-btn-dropdown flat no-caps :label="currentLanguage.name_l" icon="g_translate"
+              size="md" class="btn-setting" :color="$store.state.app.darkMode?'':'blue-grey'">
               <q-list dense>
                 <template v-for="(item,index) in languages">
-                  <q-item v-if="`${item.cc_iso}-${item.cc}`===language" clickable v-close-popup :key="index"
-                    :active="true">
+                  <q-item v-if="`${item.cc_iso}-${item.cc}`===language" clickable v-close-popup
+                    :key="index" :active="true">
                     <q-item-section>{{item.name_l}}</q-item-section>
                   </q-item>
-                  <q-item v-else clickable v-close-popup :key="index" @click="onSetLanguage(item,true)">
+                  <q-item v-else clickable v-close-popup :key="index"
+                    @click="onSetLanguage(item,true)">
                     <q-item-section>{{item.name_l}}</q-item-section>
                   </q-item>
                 </template>
@@ -84,8 +85,8 @@
             </q-btn-dropdown>
           </q-item>
           <q-item>
-            <q-btn-dropdown flat no-caps :label="$t(`size.${currentSize.key}`)" icon="format_size" size="md"
-              class="btn-setting" :color="$store.state.app.darkMode?'':'blue-grey'">
+            <q-btn-dropdown flat no-caps :label="$t(`size.${currentSize.key}`)" icon="format_size"
+              size="md" class="btn-setting" :color="$store.state.app.darkMode?'':'blue-grey'">
               <q-list dense>
                 <template v-for="(e,i) in sizes">
                   <q-item v-if="e.key===font.size" clickable v-close-popup :key="i" :active="true">
@@ -101,16 +102,17 @@
           <q-item v-if="!$q.platform.is.mobile">
             <q-btn flat no-caps size="md" class="btn-setting"
               :label="$q.fullscreen.isActive ? $t('navbar.normal_screen') : $t('navbar.full_screen')"
-              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" @click="$q.fullscreen.toggle()"
-              :color="$store.state.app.darkMode?'':'blue-grey'" v-close-popup>
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+              @click="$q.fullscreen.toggle()" :color="$store.state.app.darkMode?'':'blue-grey'"
+              v-close-popup>
               <!-- <q-tooltip>
                   {{$q.fullscreen.isActive ? $t('navbar.normal_screen') : $t('navbar.full_screen')}}
                 </q-tooltip> -->
             </q-btn>
           </q-item>
           <q-item>
-            <q-toggle dense v-model="darkMode" label="Dark mode" size="xs" color="blue-grey" style="white-space:nowrap"
-              :class="$store.state.app.darkMode?'':'q-toggle-setting'" />
+            <q-toggle dense v-model="darkMode" label="Dark mode" size="xs" color="blue-grey"
+              style="white-space:nowrap" :class="$store.state.app.darkMode?'':'q-toggle-setting'" />
           </q-item>
         </q-list>
       </div>
@@ -170,11 +172,11 @@ export default {
     },
     darkMode: {
       // getter
-      get: function() {
+      get: function () {
         return this.$q.dark.isActive
       },
       // setter
-      set: function(val) {
+      set: function (val) {
         this.$q.dark.set(val)
         this.$store.commit('app/SET_DARK_MODE', val)
       }

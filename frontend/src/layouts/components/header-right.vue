@@ -59,10 +59,7 @@
   <q-btn-dropdown flat stretch>
     <template v-slot:label>
       <q-avatar size="33px">
-        <img
-          v-if="$store.state.auth.user.avatar"
-          :src="$store.state.auth.user.avatar"
-        />
+        <img v-if="$store.state.auth.user.avatar" :src="$store.state.auth.user.avatar" />
         <img v-else :src="$store.state.avatar" />
       </q-avatar>
     </template>
@@ -71,28 +68,15 @@
         <div class="text-h6 q-mb-md">{{ $t("setting.title") }}</div>
         <q-list dense class="p-fix">
           <q-item>
-            <q-btn-dropdown
-              flat
-              no-caps
-              :label="language.name_l"
-              icon="g_translate"
-              dense
-              class="btn-setting"
-              :color="$store.getters.darkMode ? '' : 'blue-grey'"
-            >
+            <q-btn-dropdown flat no-caps :label="language.name_l" icon="g_translate" dense
+              class="btn-setting" :color="$store.getters.darkMode ? '' : 'blue-grey'">
               <q-list dense>
                 <template v-for="(e, i) in languages">
-                  <q-item
-                    clickable
-                    v-close-popup
-                    :key="i"
-                    :active="
+                  <q-item clickable v-close-popup :key="i" :active="
                       `${e.cc_iso}-${e.cc}` === $store.getters.language
                         ? true
                         : false
-                    "
-                    @click="onSetLanguage(e)"
-                  >
+                    " @click="onSetLanguage(e)">
                     <q-item-section>{{ e.name_l }}</q-item-section>
                   </q-item>
                 </template>
@@ -112,53 +96,33 @@
             </q-btn-dropdown>
           </q-item> -->
           <q-item v-if="!$q.platform.is.mobile">
-            <q-btn
-              flat
-              no-caps
-              dense
-              class="btn-setting"
-              :label="
+            <q-btn flat no-caps dense class="btn-setting" :label="
                 $q.fullscreen.isActive
                   ? $t('navbar.normal_screen')
                   : $t('navbar.full_screen')
-              "
-              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-              @click="$q.fullscreen.toggle()"
-              :color="$store.getters.darkMode ? '' : 'blue-grey'"
-              v-close-popup
-            >
+              " :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+              @click="$q.fullscreen.toggle()" :color="$store.getters.darkMode ? '' : 'blue-grey'"
+              v-close-popup>
               <!-- <q-tooltip>
                   {{$q.fullscreen.isActive ? $t('navbar.normal_screen') : $t('navbar.full_screen')}}
                 </q-tooltip> -->
             </q-btn>
           </q-item>
           <q-item>
-            <q-toggle
-              dense
-              v-model="darkMode"
-              label="Dark mode"
-              size="xs"
-              color="blue-grey"
+            <q-toggle dense v-model="darkMode" label="Dark mode" size="xs" color="blue-grey"
               style="white-space:nowrap"
-              :class="$store.getters.darkMode ? '' : 'q-toggle-setting'"
-            />
+              :class="$store.getters.darkMode ? '' : 'q-toggle-setting'" />
           </q-item>
         </q-list>
       </div>
       <q-separator vertical inset class="q-mx-lg" />
       <div class="column items-center cursor-pointer">
         <q-avatar size="72px" @click="onRouterLink('/profile')">
-          <img
-            v-if="$store.state.auth.user.avatar"
-            :src="$store.state.auth.user.avatar"
-          />
+          <img v-if="$store.state.auth.user.avatar" :src="$store.state.auth.user.avatar" />
           <img v-else :src="$store.state.avatar" />
         </q-avatar>
         <!-- <router-link to="/profile"> -->
-        <div
-          class="q-mt-md q-mb-xs cursor-pointer text-blue"
-          @click="onRouterLink('/profile')"
-        >
+        <div class="q-mt-md q-mb-xs cursor-pointer text-blue" @click="onRouterLink('/profile')">
           {{
             $store.state.auth.user
               ? $store.state.auth.user.fullName
@@ -168,15 +132,8 @@
           }}
         </div>
         <!-- </router-link> -->
-        <q-btn
-          :label="$t('navbar.log_out')"
-          @click.prevent="onLogout"
-          color="blue-grey"
-          size="sm"
-          class="q-btn--square"
-          style="white-space:nowrap"
-          v-close-popup
-        />
+        <q-btn no-caps :label="$t('navbar.log_out')" @click.prevent="onLogout" color="blue-grey"
+          size="sm" class="q-btn--square" style="white-space:nowrap" v-close-popup />
       </div>
     </div>
   </q-btn-dropdown>

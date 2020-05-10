@@ -124,7 +124,7 @@ class ExercisesController {
       req.body.createdAt = new Date();
       req.body.createdBy = req.verify._id;
       req.body.createdIp = getIp(req);
-      console.log(req.body.createdIp);
+      // console.log(req.body.createdIp);
       // req.body.userAgent = getUserAgent(req);
       req.body.startAt = moment(req.body.startAt, 'DD/MM/YYYY HH:mm:00');
       req.body.endAt = moment(req.body.endAt, 'DD/MM/YYYY HH:mm:00');

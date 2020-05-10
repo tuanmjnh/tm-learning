@@ -97,9 +97,9 @@ class Application {
     // Mount the router at /api so all its routes start with /api
     this.app.use(`${process.env.BASE_URL}api`, this.Routes.router);
   }
-  public Start(port: number): void {
+  public start(port: number): any {
     // this.Close();
-    this.app
+    return this.app
       .listen(port) // , '192.168.1.10' // '127.0.0.1'
       .on('listening', () => {
         // process.env.HOST = `http://${server.address().address}:${port}`
@@ -111,7 +111,7 @@ class Application {
         console.log(err);
       });
   }
-  public Close(): void {
+  public close(): void {
     process.exit();
     console.log(process);
   }
