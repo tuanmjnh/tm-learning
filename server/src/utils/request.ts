@@ -5,8 +5,8 @@ export const getIp = (request: any) => {
   // console.log(req.connection.remotePort)
   // console.log(req.connection.localAddress)
   // console.log(req.connection.localPort)
-  const _ip = request.ip;
-  return _ip === '::1' || !_ip ? '127.0.0.1' : _ip;
+  const ip = request.ip;
+  return ip === '::1' || !ip ? '127.0.0.1' : ip;
 };
 
 export const getHost = (request: any) => {

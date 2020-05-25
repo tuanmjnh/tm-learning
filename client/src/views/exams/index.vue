@@ -113,7 +113,6 @@ export default {
           if (!e.exams.length) e.eligibleExams = []
           else e.eligibleExams = e.exams.filter(x => x.result)
         })
-        console.log(this.items)
         this.pagination = params.pagination
         this.pagination.rowsNumber = x.rowsNumber
       })

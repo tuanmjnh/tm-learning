@@ -271,7 +271,7 @@ class ExamsController {
               {
                 $match: {
                   $expr: {
-                    $and: [{ $eq: ['$startBy', '$$id'] }],
+                    $and: [{ $eq: ['$startBy', '$$id'] }, { $eq: ['$exercise', req.query.key] }],
                   },
                 },
               },
