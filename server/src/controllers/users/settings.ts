@@ -1,9 +1,9 @@
-import { Types } from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
-import { MUserSetting } from '../../models/users/settings';
+import { Types } from "mongoose";
+import { Request, Response, NextFunction } from "express";
+import { MUserSetting } from "../../models/users/settings";
 
 class UserSettingController {
-  public path = 'user-setting';
+  public path = "user-setting";
   public get = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!Types.ObjectId.isValid(req.query._id as string)) {
@@ -16,14 +16,15 @@ class UserSettingController {
       if (rs) return res.status(200).json(rs);
       else return res.status(200).json(null);
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public put = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // if (!req.params.id) return res.status(500).send('Incorrect Id!')
-      if (!req.body || Object.keys(req.body).length < 1) return res.status(500).send('invalid');
+      if (!req.body || Object.keys(req.body).length < 1)
+        return res.status(500).send("invalid");
       MUserSetting.updateOne(
         { user_id: req.verify._id },
         {
@@ -35,15 +36,16 @@ class UserSettingController {
             darkMode: req.body.darkMode,
           },
         },
+        undefined,
         (e, rs) => {
           // { multi: true, new: true },
           if (e) return res.status(500).send(e);
           return res.status(200).json(rs);
-        },
+        }
       );
     } catch (e) {
       console.log(e);
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 }

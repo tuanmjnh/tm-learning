@@ -3,7 +3,7 @@
 let path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports = function(ctx) {
+module.exports = function (ctx) {
   return {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
@@ -111,29 +111,29 @@ module.exports = function(ctx) {
       },
       env: ctx.dev
         ? {
-            // so on dev we'll have
-            APP_TITLE: JSON.stringify('TM-Learning'),
-            API: JSON.stringify('http://localhost:8001/api'),
-            API_UPLOAD: JSON.stringify('http://localhost:8001/uploads'),
-            API_PUBLIC: JSON.stringify('http://localhost:8001/public'),
-            API_FILE_UPLOAD: JSON.stringify(
-              'http://localhost:8001/api/file-manager'
-            )
-          }
+          // so on dev we'll have
+          APP_TITLE: JSON.stringify('TM-Learning'),
+          API: JSON.stringify('http://localhost:8001/api'),
+          API_UPLOAD: JSON.stringify('http://localhost:8001/uploads'),
+          API_PUBLIC: JSON.stringify('http://localhost:8001/public'),
+          API_FILE_UPLOAD: JSON.stringify(
+            'http://localhost:8001/api/file-manager'
+          )
+        }
         : {
-            // and on build (production):
-            APP_TITLE: JSON.stringify('TM-Learning'),
-            API: JSON.stringify('http://10.17.20.222/tm-learning-backend/api'),
-            API_UPLOAD: JSON.stringify(
-              'http://10.17.20.222/tm-learning-backend/uploads'
-            ),
-            API_PUBLIC: JSON.stringify(
-              'http://10.17.20.222/tm-learning-backend/public'
-            ),
-            API_FILE_UPLOAD: JSON.stringify(
-              'http://10.17.20.222/tm-learning-backend/api/file-manager'
-            )
-          }
+          // and on build (production):
+          APP_TITLE: JSON.stringify('TM-Learning'),
+          API: JSON.stringify('http://10.17.20.222/tm-learning-backend/api'),
+          API_UPLOAD: JSON.stringify(
+            'http://10.17.20.222/tm-learning-backend/uploads'
+          ),
+          API_PUBLIC: JSON.stringify(
+            'http://10.17.20.222/tm-learning-backend/public'
+          ),
+          API_FILE_UPLOAD: JSON.stringify(
+            'http://10.17.20.222/tm-learning-backend/api/file-manager'
+          )
+        }
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer

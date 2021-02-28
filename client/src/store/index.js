@@ -51,8 +51,8 @@ const Store = new Vuex.Store({
       post: false,
       put: false,
       patch: false,
-      delete: false,
-    },
+      delete: false
+    }
   },
   mutations: {
     SET_LOADING(state, obj) {
@@ -64,13 +64,13 @@ const Store = new Vuex.Store({
         post: false,
         put: false,
         patch: false,
-        delete: false,
+        delete: false
       };
-    },
+    }
   },
   // enable strict mode (adds overhead!)
   // for dev mode only
-  strict: process.env.DEV,
+  strict: process.env.DEV
 });
 
 export default Store;

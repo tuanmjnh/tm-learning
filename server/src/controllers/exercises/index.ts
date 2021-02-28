@@ -1,45 +1,51 @@
-import moment from 'moment';
-import Logger from '../../services/logger';
-import Pagination from '../../utils/pagination';
-import { Types, startSession } from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
-import { getIp, getUserAgent } from '../../utils/request';
-import { MExercises } from '../../models/exercises';
-import { MQuestion } from '../../models/questions';
+import moment from "moment";
+import Logger from "../../services/logger";
+import Pagination from "../../utils/pagination";
+import { Types, startSession } from "mongoose";
+import { Request, Response, NextFunction } from "express";
+import { getIp, getUserAgent } from "../../utils/request";
+import { MExercises } from "../../models/exercises";
+import { MQuestion } from "../../models/questions";
 
 class ExercisesController {
-  public path = 'exercises';
+  public path = "exercises";
   public get = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const conditions = {} as any;
       if (req.query.filter) {
         conditions.$text = { $search: req.query.filter };
       }
-      conditions.flag = parseInt(req.query.flag.toString()) || 1;
-      const countDocuments = await MExercises.where(conditions as any).countDocuments();
+      const flag = req.query.flag as string;
+      conditions.flag = parseInt(flag) || 1;
+      const countDocuments = await MExercises.where(
+        conditions as any
+      ).countDocuments();
       const rs = await MExercises.aggregate([
         { $match: conditions },
         {
           $lookup: {
-            from: 'types',
-            let: { qtype: { $toString: '$type' } },
-            as: 'types',
+            from: "types",
+            let: { qtype: { $toString: "$type" } },
+            as: "types",
             pipeline: [
               {
                 $match: {
                   $expr: {
-                    $and: [{ $eq: ['$key', 'exercises_type'] }, { $eq: ['$code', '$$qtype'] }],
+                    $and: [
+                      { $eq: ["$key", "exercises_type"] },
+                      { $eq: ["$code", "$$qtype"] },
+                    ],
                   },
                 },
               },
-              { $project: { _id: 0, typeName: '$name' } },
+              { $project: { _id: 0, typeName: "$name" } },
             ],
           },
         },
         {
           $replaceRoot: {
             newRoot: {
-              $mergeObjects: [{ $arrayElemAt: ['$types', 0] }, '$$ROOT'],
+              $mergeObjects: [{ $arrayElemAt: ["$types", 0] }, "$$ROOT"],
             },
           },
         },
@@ -49,16 +55,20 @@ class ExercisesController {
           },
         },
       ])
-        .skip((parseInt(req.query.page as string) - 1) * parseInt(req.query.rowsPerPage as string))
+        .skip(
+          (parseInt(req.query.page as string) - 1) *
+            parseInt(req.query.rowsPerPage as string)
+        )
         .limit(parseInt(req.query.rowsPerPage as string))
         .sort({
-          [(req.query.sortBy as string) || 'orders']: req.query.descending === 'true' ? -1 : 1,
+          [(req.query.sortBy as string) || "orders"]:
+            req.query.descending === "true" ? -1 : 1,
         }) // 1 ASC, -1 DESC
         .exec();
       return res.status(200).json({ rowsNumber: countDocuments, data: rs });
     } catch (e) {
       console.log(e);
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
@@ -71,11 +81,11 @@ class ExercisesController {
             return res.status(200).json(rs);
           });
         } else {
-          return res.status(500).send('invalid');
+          return res.status(500).send("invalid");
         }
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
@@ -92,27 +102,33 @@ class ExercisesController {
 
   public getAttr = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      MExercises.distinct(req.query.key ? 'attr.key' : 'attr.value', null, (e, rs) => {
-        if (e) return res.status(500).send(e);
-        if (req.query.filter)
-          rs = rs.filter((x) => new RegExp(req.query.filter as string, 'i').test(x));
-        const countDocuments = rs.length;
-        if (req.query.page && req.query.rowsPerPage)
-          rs = Pagination.get(
-            rs,
-            parseInt(req.query.page as string),
-            parseInt(req.query.rowsPerPage as string),
-          );
-        return res.status(200).json({ rowsNumber: countDocuments, data: rs });
-      });
+      MExercises.distinct(
+        req.query.key ? "attr.key" : "attr.value",
+        undefined,
+        (e, rs: any) => {
+          if (e) return res.status(500).send(e);
+          if (req.query.filter)
+            rs = rs.filter((x) =>
+              new RegExp(req.query.filter as string, "i").test(x)
+            );
+          const countDocuments = rs.length;
+          if (req.query.page && req.query.rowsPerPage)
+            rs = Pagination.get(
+              rs,
+              parseInt(req.query.page as string),
+              parseInt(req.query.rowsPerPage as string)
+            );
+          return res.status(200).json({ rowsNumber: countDocuments, data: rs });
+        }
+      );
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public post = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body || Object.keys(req.body).length < 1) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
     const session = await startSession();
     session.startTransaction();
@@ -126,8 +142,8 @@ class ExercisesController {
       req.body.createdIp = getIp(req);
       // console.log(req.body.createdIp);
       // req.body.userAgent = getUserAgent(req);
-      req.body.startAt = moment(req.body.startAt, 'DD/MM/YYYY HH:mm:00');
-      req.body.endAt = moment(req.body.endAt, 'DD/MM/YYYY HH:mm:00');
+      req.body.startAt = moment(req.body.startAt, "DD/MM/YYYY HH:mm:00");
+      req.body.endAt = moment(req.body.endAt, "DD/MM/YYYY HH:mm:00");
       req.body.totalQuestion = questions.length;
       req.body.questions = [];
       // Save Exercises
@@ -153,10 +169,10 @@ class ExercisesController {
           $set: {
             questions: questionsExercises,
           },
-        },
+        }
       );
       // Push logs
-      Logger.set(req, this.path, dataSave._id, 'insert');
+      Logger.set(req, this.path, dataSave._id, "insert");
       return res.status(201).json({ data: dataSave, result: rs });
     } catch (e) {
       console.log(e);
@@ -169,7 +185,8 @@ class ExercisesController {
   public put = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // if (!req.params.id) return res.status(500).send('Incorrect Id!')
-      if (!req.body || Object.keys(req.body).length < 1) return res.status(500).send('invalid');
+      if (!req.body || Object.keys(req.body).length < 1)
+        return res.status(500).send("invalid");
       if (Types.ObjectId.isValid(req.body._id)) {
         MExercises.updateOne(
           { _id: req.body._id },
@@ -187,16 +204,17 @@ class ExercisesController {
               flag: parseInt(req.body.flag),
             },
           },
+          undefined,
           (e, rs) => {
             // { multi: true, new: true },
             if (e) return res.status(500).send(e);
             // Push logs
-            Logger.set(req, this.path, rs._id, 'update');
+            Logger.set(req, this.path, rs._id, "update");
             return res.status(202).json(rs);
-          },
+          }
         );
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
       return res.status(500).send(e);
@@ -209,11 +227,14 @@ class ExercisesController {
       for await (const _id of req.body._id) {
         const x = await MExercises.findById(_id);
         if (x) {
-          const _x = await MExercises.updateOne({ _id }, { $set: { flag: x.flag === 1 ? 0 : 1 } });
+          const _x = await MExercises.updateOne(
+            { _id },
+            { $set: { flag: x.flag === 1 ? 0 : 1 } }
+          );
           if (_x.nModified) {
             rs.success.push(_id);
             // Push logs
-            Logger.set(req, this.path, _id, x.flag === 1 ? 'lock' : 'unlock');
+            Logger.set(req, this.path, _id, x.flag === 1 ? "lock" : "unlock");
           } else rs.error.push(_id);
         }
       }
@@ -226,14 +247,14 @@ class ExercisesController {
   public delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (Types.ObjectId.isValid(req.params._id)) {
-        MExercises.deleteOne({ _id: req.params._id }, (e: any) => {
+        MExercises.deleteOne({ _id: req.params._id }, undefined, (e: any) => {
           if (e) return res.status(500).send(e);
           // Push logs
-          Logger.set(req, this.path, req.params._id, 'delete');
+          Logger.set(req, this.path, req.params._id, "delete");
           return res.status(204).json(true);
         });
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
       return res.status(500).send(e);

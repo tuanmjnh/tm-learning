@@ -53,7 +53,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'prefer-promise-reject-errors': 'off',
     'space-before-function-paren': 'off',
-    'comma-dangle': 'error',
+    'comma-dangle': 'off',
     'no-trailing-spaces': 'error',
     'no-mixed-operators': 'off',
     'no-extend-native': 'off',

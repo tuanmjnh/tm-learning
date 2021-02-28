@@ -1,33 +1,40 @@
-import Logger from '../../services/logger';
-import { Types, startSession } from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
-import { getIp } from '../../utils/request';
-import { MUser } from '../../models/users';
-import { SHA256, NewGuid } from '../../utils/crypto';
-import { isBoolean } from '../../utils/validate';
+import Logger from "../../services/logger";
+import { Types, startSession } from "mongoose";
+import { Request, Response, NextFunction } from "express";
+import { getIp } from "../../utils/request";
+import { MUser } from "../../models/users";
+import { SHA256, NewGuid } from "../../utils/crypto";
+import { isBoolean } from "../../utils/validate";
 
 class UsersController {
-  public path = 'users';
+  public path = "users";
   public get = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const conditions = { $and: [{ enable: req.query.enable ? req.query.enable : true }] };
+      const conditions = {
+        $and: [{ enable: req.query.enable ? req.query.enable : true }],
+      };
       if (req.query.filter) {
         conditions.$and.push({
           $or: [
-            { email: new RegExp(req.query.filter as string, 'i') },
-            { full_name: new RegExp(req.query.filter as string, 'i') },
-            { person_number: new RegExp(req.query.filter as string, 'i') },
-            { phone: new RegExp(req.query.filter as string, 'i') },
+            { email: new RegExp(req.query.filter as string, "i") },
+            { full_name: new RegExp(req.query.filter as string, "i") },
+            { person_number: new RegExp(req.query.filter as string, "i") },
+            { phone: new RegExp(req.query.filter as string, "i") },
           ],
         } as any);
       }
-      if (!req.query.sortBy) req.query.sortBy = 'email';
-      const countDocuments = await MUser.where(conditions as any).countDocuments();
+      if (!req.query.sortBy) req.query.sortBy = "email";
+      const countDocuments = await MUser.where(
+        conditions as any
+      ).countDocuments();
       const options = {
-        skip: (parseInt(req.query.page as string) - 1) * parseInt(req.query.rowsPerPage as string),
+        skip:
+          (parseInt(req.query.page as string) - 1) *
+          parseInt(req.query.rowsPerPage as string),
         limit: parseInt(req.query.rowsPerPage as string),
         sort: {
-          [(req.query.sortBy as string) || 'email']: req.query.descending === 'true' ? -1 : 1,
+          [(req.query.sortBy as string) || "email"]:
+            req.query.descending === "true" ? -1 : 1,
         }, // 1 ASC, -1 DESC
       };
       MUser.find(conditions as any, null, options, (e: any, rs: any) => {
@@ -36,7 +43,7 @@ class UsersController {
         return res.status(200).json({ rowsNumber: countDocuments, data: rs });
       });
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
@@ -49,7 +56,7 @@ class UsersController {
             return res.status(200).json(rs);
           });
         } else {
-          return res.status(500).send('invalid');
+          return res.status(500).send("invalid");
         }
       } else if (req.query.username) {
         MUser.findOne({ username: req.query.username as string }, (e, rs) => {
@@ -63,7 +70,7 @@ class UsersController {
         });
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
@@ -72,7 +79,11 @@ class UsersController {
       if (req.body.users) {
         let rs: any[] = [];
         const qry = MUser.aggregate([
-          { $match: { $and: [{ username: { $in: req.body.users } }, { enable: true }] } },
+          {
+            $match: {
+              $and: [{ username: { $in: req.body.users } }, { enable: true }],
+            },
+          },
           {
             $project: {
               password: 0,
@@ -84,8 +95,8 @@ class UsersController {
           },
           {
             $sort: {
-              [(req.query.sortBy as string) || 'username']:
-                req.query.descending === 'true' ? -1 : 1,
+              [(req.query.sortBy as string) || "username"]:
+                req.query.descending === "true" ? -1 : 1,
             } as any,
           },
         ]);
@@ -96,19 +107,21 @@ class UsersController {
       return res.status(200).json([]);
     } catch (e) {
       console.log(e);
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public post = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.body || Object.keys(req.body).length < 1 || !req.body.username) {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
       const x = await MUser.findOne({ username: req.body.username });
-      if (x) return res.status(501).send('exist');
-      const password = req.body.password ? req.body.password : NewGuid().split('-')[0];
-      req.body.salt = NewGuid('n');
+      if (x) return res.status(501).send("exist");
+      const password = req.body.password
+        ? req.body.password
+        : NewGuid().split("-")[0];
+      req.body.salt = NewGuid("n");
       req.body.password = SHA256(password + req.body.salt);
       req.body.created = { at: new Date(), by: req.verify._id, ip: getIp(req) };
       const data = new MUser(req.body);
@@ -117,16 +130,16 @@ class UsersController {
         if (e) return res.status(500).send(e);
         rs.password = password;
         // Push logs
-        Logger.set(req, this.path, rs._id, 'insert');
+        Logger.set(req, this.path, rs._id, "insert");
         return res.status(201).json(rs);
       });
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public import = async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body || !req.body.length) return res.status(500).send('invalid');
+    if (!req.body || !req.body.length) return res.status(500).send("invalid");
     const session = await startSession();
     session.startTransaction();
     try {
@@ -139,7 +152,7 @@ class UsersController {
           rs.error.push(i);
           continue;
         }
-        e.salt = NewGuid('n');
+        e.salt = NewGuid("n");
         e.password = SHA256(e.password + e.salt);
         e.created = { at: new Date(), by: req.verify._id, ip: getIp(req) };
         const item = new MUser(e);
@@ -152,14 +165,15 @@ class UsersController {
       console.log(e);
       await session.abortTransaction();
       session.endSession();
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.body && !Array.isArray(req.body)) return res.status(500).send('invalid');
-      if (req.body.length < 1) return res.status(500).send('Empty data!');
+      if (!req.body && !Array.isArray(req.body))
+        return res.status(500).send("invalid");
+      if (req.body.length < 1) return res.status(500).send("Empty data!");
       const data: any[] = [];
       req.body.forEach((e) => {
         data.push(new MUser(e));
@@ -172,30 +186,35 @@ class UsersController {
           return res.status(500).send(e);
         });
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
-  public insertOne = async (req: Request, res: Response, next: NextFunction) => {
+  public insertOne = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      if (!req.body) return res.status(500).send('invalid');
+      if (!req.body) return res.status(500).send("invalid");
       const data = new MUser(req.body);
       // data.validate();
       MUser.collection.insertOne(data, (e: any, rs: any) => {
         if (e) return res.status(500).send(e);
         // Push logs
-        Logger.set(req, this.path, rs._id, 'insert');
+        Logger.set(req, this.path, rs._id, "insert");
         return res.status(200).json(rs);
       });
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public put = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // if (!req.body._id) return res.status(500).send('invalid')
-      if (!req.body || Object.keys(req.body).length < 1) return res.status(500).send('invalid');
+      if (!req.body || Object.keys(req.body).length < 1)
+        return res.status(500).send("invalid");
       if (Types.ObjectId.isValid(req.body._id)) {
         MUser.updateOne(
           { _id: req.body._id },
@@ -215,30 +234,35 @@ class UsersController {
               roles: req.body.roles,
             },
           },
+          undefined,
           (e, rs) => {
             // { multi: true, new: true },
             if (e) return res.status(500).send(e);
             // Push logs
-            Logger.set(req, this.path, rs._id, 'update');
+            Logger.set(req, this.path, rs._id, "update");
             return res.status(202).json(rs);
-          },
+          }
         );
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
-  public resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  public resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       if (Types.ObjectId.isValid(req.body._id)) {
         // Find user by id
         const x = await MUser.findById(req.body._id);
-        if (!x) return res.status(404).send('no_exist');
+        if (!x) return res.status(404).send("no_exist");
         // Generate password
-        const password = NewGuid().split('-')[0];
+        const password = NewGuid().split("-")[0];
         MUser.updateOne(
           { _id: req.body._id },
           {
@@ -247,29 +271,34 @@ class UsersController {
               lastChangePass: new Date(),
             },
           },
+          undefined,
           (e: any, rs: any) => {
             if (e) return res.status(500).send(e);
             // Push logs
-            Logger.set(req, this.path, rs._id, 'reset-password');
+            Logger.set(req, this.path, rs._id, "reset-password");
             res.status(206).json({ password });
-          },
+          }
         );
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
-  public changePassword = async (req: Request, res: Response, next: NextFunction) => {
+  public changePassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       // Find user by id
       const user = await MUser.findOne({ _id: req.verify._id });
-      if (!user) return res.status(404).send('no_exist');
+      if (!user) return res.status(404).send("no_exist");
       // check password
       if (user.password !== SHA256(req.body.oldPassword + user.salt))
-        return res.status(505).json({ msg: 'wrong_password' });
+        return res.status(505).json({ msg: "wrong_password" });
       // set new password
       MUser.updateOne(
         { _id: req.verify._id },
@@ -279,15 +308,16 @@ class UsersController {
             lastChangePass: new Date(),
           },
         },
+        undefined,
         (e, rs) => {
           if (e) return res.status(500).send(e);
           // Push logs
-          Logger.set(req, this.path, user._id, 'change-password');
+          Logger.set(req, this.path, user._id, "change-password");
           res.status(202).json(true);
-        },
+        }
       );
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
@@ -303,12 +333,12 @@ class UsersController {
         if (x) {
           const _x = await MUser.updateOne(
             { _id },
-            { $set: { enable: x.enable === true ? false : true } },
+            { $set: { enable: x.enable === true ? false : true } }
           );
           if (_x.nModified) {
             rs.success.push(_id);
             // Push logs
-            Logger.set(req, this.path, _id, x.enable ? 'lock' : 'unlock');
+            Logger.set(req, this.path, _id, x.enable ? "lock" : "unlock");
           } else rs.error.push(_id);
         }
       }
@@ -324,46 +354,47 @@ class UsersController {
       //   return res.status(500).send('invalid')
       // }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public verified = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!isBoolean(req.body.verified)) return res.status(500).send('invalid');
+      if (!isBoolean(req.body.verified)) return res.status(500).send("invalid");
       if (Types.ObjectId.isValid(req.body._id)) {
         MUser.updateOne(
           { _id: req.body._id },
           { $set: { verified: req.body.verified } },
+          undefined,
           (e, rs) => {
             if (e) return res.status(500).send(e);
             // Push logs
-            Logger.set(req, this.path, req.params._id, 'verified');
+            Logger.set(req, this.path, req.params._id, "verified");
             return res.status(205).json(rs);
-          },
+          }
         );
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 
   public delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (Types.ObjectId.isValid(req.params._id)) {
-        MUser.deleteOne({ _id: req.params._id }, (e: any) => {
+        MUser.deleteOne({ _id: req.params._id }, undefined, (e: any) => {
           if (e) return res.status(500).send(e);
           // Push logs
-          Logger.set(req, this.path, req.params._id, 'delete');
+          Logger.set(req, this.path, req.params._id, "delete");
           return res.status(204).json(true);
         });
       } else {
-        return res.status(500).send('invalid');
+        return res.status(500).send("invalid");
       }
     } catch (e) {
-      return res.status(500).send('invalid');
+      return res.status(500).send("invalid");
     }
   };
 }
