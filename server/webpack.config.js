@@ -45,12 +45,14 @@ module.exports = {
   plugins: [
     new webpack.ProgressPlugin(),
     // new CleanWebpackPlugin(),
-    new CopyPlugin([
-      { from: 'package.json', to: './' },
-      { from: '.env', to: './' },
-      { from: './src/public/', to: './public/' },
-      { from: './statics/', to: './' },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        { from: 'package.json', to: './' },
+        { from: '.env', to: './' },
+        { from: './src/public/', to: './public/' },
+        { from: './statics/', to: './' },
+      ]
+    }),
   ],
   node: {
     // Need this when working with express, otherwise the build fails

@@ -107,7 +107,8 @@ module.exports = function (ctx) {
           // 'vue$': 'vue/dist/vue.esm.js',
           '@': path.resolve('src')
         };
-        cfg.plugins.push(new CopyPlugin([{ from: './statics/', to: '../' }]));
+        // cfg.plugins.push(new CopyPlugin([{ from: './statics/', to: '../' }]));
+        cfg.plugins.push(new CopyPlugin({ patterns: [{ from: './statics/', to: '../' }] }));
       },
       env: ctx.dev
         ? {
